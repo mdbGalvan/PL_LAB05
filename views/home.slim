@@ -18,29 +18,6 @@ p This website contains a simple example of a predictive parser
         | example_err
       input#files type="file" 
 
-    javascript:
-        function dump(fileName) {
-          $.get(fileName, function (data) {
-            $("#original").val(data);
-            // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
-            if (window.localStorage) {localStorage.original = data;}
-          });
-        };
-
-        document.getElementById('files').addEventListener('change', CopyMe, false);
-
-        function CopyMe(evt) {
-          var file = evt.target.files[0];
-            if (file) {
-              var reader = new FileReader();
-                reader.onload = function(e) { 
-                  original.innerHTML = e.target.result;
-                    }
-                    var c = reader.readAsText(file);
-                }
-            else { alert("Failed to load file"); }
-        }
-
 
 input#PARSE.mylink[value="parse" type="button"]
 pre#OUTPUT

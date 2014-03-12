@@ -16,31 +16,6 @@
         <button id ="exampleerr"  type="button" onclick="dump('/examples/example_err.txt');">example_err</button>
         <input type="file" id="files"/> 
       </div>
-      <script type="text/javascript">
-        function dump(fileName) {
-          $.get(fileName, function (data) {
-            $("#original").val(data);
-            // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
-            if (window.localStorage) {localStorage.original = data;}
-           });
-        };
-
-        document.getElementById('files').addEventListener('change', CopyMe, false);
-
-        function CopyMe(evt) {
-          var file = evt.target.files[0];
-            if (file) {
-              var reader = new FileReader();
-                reader.onload = function(e) { 
-                  original.innerHTML = e.target.result;
-                    }
-                    var c = reader.readAsText(file);
-                }
-            else { alert("Failed to load file"); }
-        }
-
-
-       </script>
        <script type="text/javascript" src="javascripts/main.js"></script>
      </div>
   </div>    

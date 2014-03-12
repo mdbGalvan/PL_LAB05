@@ -31,6 +31,7 @@ end
 
 get('/styles.css'){ scss :styles }
 get('/javascripts/main.js'){ coffee :main }
+get('/javascripts/load.js'){ coffee :load }
 
 get '/' do
   slim :home
