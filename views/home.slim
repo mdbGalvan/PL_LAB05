@@ -22,7 +22,9 @@ p This website contains a simple example of a predictive parser
         function dump(fileName) {
           $.get(fileName, function (data) {
             $("#original").val(data);
-           });
+            // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
+            if (window.localStorage) {localStorage.original = data;}
+          });
         };
 
         document.getElementById('files').addEventListener('change', CopyMe, false);

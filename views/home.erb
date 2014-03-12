@@ -20,6 +20,8 @@
         function dump(fileName) {
           $.get(fileName, function (data) {
             $("#original").val(data);
+            // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
+            if (window.localStorage) {localStorage.original = data;}
            });
         };
 

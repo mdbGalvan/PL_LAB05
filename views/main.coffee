@@ -9,6 +9,10 @@ main = ()->
 
 window.onload = ()-> 
   PARSE.onclick = main
+  if window.localStorage and localStorage.original
+    $("#original").val localStorage.original
+  else
+    $("#original").val "var a = \"hello\"; // initialize a\nvar b = function(x) {\n  var c = 3;\n  return x+c;\n};"
 
 Object.constructor::error = (message, t) ->
   t = t or this
