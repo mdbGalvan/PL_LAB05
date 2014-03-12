@@ -12,7 +12,7 @@ window.onload = ()->
   if window.localStorage and localStorage.original
     $("#original").val localStorage.original
   else
-    $("#original").val "var a = \"hello\"; // initialize a\nvar b = function(x) {\n  var c = 3;\n  return x+c;\n};"
+    $("#original").val "b = 5 + y"
 
 Object.constructor::error = (message, t) ->
   t = t or this
@@ -32,13 +32,13 @@ String::tokens = ->
   n = undefined # The number value.
   m = undefined # Matching
   result = [] # An array to hold the results.
-  WHITES = /\s+/g
-  ID = /[a-zA-Z_]\w*/g
-  NUM = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g
-  STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g
-  ONELINECOMMENT = /\/\/.*/g
-  MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
-  ONECHAROPERATORS = /([-+*\/=()&|;:,<>{}[\]])/g
+  WHITES = /\s+/g         # Casa con Carácter individual en espacio en blanco
+  ID = /[a-zA-Z_]\w*/g    # Casa con una palabra que contiene letras o dígitos y empieza con letras o _
+  NUM = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g             # Casa con dígitos con coma flotante
+  STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g           # Casa con palabras entre "" ó '', y escapa \", \'
+  ONELINECOMMENT = /\/\/.*/g                          # Casa con // comentario
+  MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g         # /* comentario con multilínea */
+  ONECHAROPERATORS = /([-+*\/%\^=()&|;:,.<>{}[\]])/g  # He añadido ^, % y .
   tokens = [
     WHITES
     ID
