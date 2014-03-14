@@ -37,6 +37,7 @@ String::tokens = ->
   NUM = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g             # Casa con dígitos con coma flotante
   STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g           # Casa con palabras entre "" ó '', y escapa \", \'
   ONELINECOMMENT = /\/\/.*/g                          # Casa con // comentario
+  COMPARISONOPERATOR = /[<>=!]=|[<>]/g                # Casa con <=, >=, ==, !=, <>
   MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g         # /* comentario con multilínea */
   ONECHAROPERATORS = /([-+*\/%\^=()&|;:,.<>{}[\]])/g  # He añadido ^, % y .
   tokens = [
@@ -48,7 +49,11 @@ String::tokens = ->
     MULTIPLELINECOMMENT
     ONECHAROPERATORS
   ]
-  RESERVED_WORD = p: "P"
+  RESERVED_WORD = {
+            p: "P",
+            "if": "IF",
+            then: "THEN"
+        };
   
   # Make a token object.
   make = (type, value) ->
@@ -61,7 +66,6 @@ String::tokens = ->
     str = m[0]
     i += str.length # Warning! side effect on i
     str
-
   
   # Begin tokenization. If the source string is empty, return nothing.
   return  unless this
@@ -95,12 +99,16 @@ String::tokens = ->
         result.push make("NUM", n)
       else
         make("NUM", m[0]).error "Bad number"
-    
+
     # string
     else if m = STRING.bexec(this)
       result.push make("STRING", 
                         getTok().replace(/^["']|["']$/g, ""))
-    
+
+    # comparision
+    else if m = COMPARISONOPERATOR.bexec(this)
+      result.push make("COMPARISON", getTok())
+      
     # single-character operator
     else if m = ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -148,10 +156,30 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "IF"
+      match "IF"
+      left = condition()
+      match "THEN"
+      right = statement()
+      result =
+        type: "IF"
+        left: left
+        right: right
     else # Error!
       throw "Syntax Error. Expected identifier but found " + 
         (if lookahead then lookahead.value else "end of input") + 
         " near '#{input.substr(lookahead.from)}'"
+    result
+
+  condition = ->
+    left = expression()
+    type = lookahead.value
+    match "COMPARISON"
+    right = expression()
+    result =
+      type: type
+      left: left
+      right: right
     result
 
   expression = ->

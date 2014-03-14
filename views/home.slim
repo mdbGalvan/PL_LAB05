@@ -8,7 +8,7 @@ p This website contains a simple example of a predictive parser
   br
   div
     .loadfile
-      button#example1[type="button" onclick="dump('/examples/example1.txt');"]
+      button#example1[type="button" onclick="dump_ajax('/examples/example1.txt');"]
         | example1
       button#example2[type="button" onclick="dump('/examples/example2.txt');"]
         | example2
@@ -18,6 +18,25 @@ p This website contains a simple example of a predictive parser
         | example_err
       input#files type="file" 
 
+  javascript:
+      function dump(fileName) {
+          $.get(fileName, function (data) {
+            $("#original").val(data);
+            if (window.localStorage) {localStorage.original = data;}
+          });
+          
+        };
+      function dump_ajax(fileName) {
+        $.ajax({
+          url : fileName,
+                dataType: "text",
+                success : function (data) {
+                  $("#original").val(data);
+                  // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
+                  if (window.localStorage) {localStorage.original = data;}
+                }
+        });
+      }
 
 input#PARSE.mylink[value="parse" type="button"]
 pre#OUTPUT
