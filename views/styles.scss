@@ -117,3 +117,87 @@ nav a.current {
 .centered {
   text-align: center;
 }
+
+/* ESTILO DE LA SALIDA DE LOS DATOS*/
+
+.hidden {
+  display: none;
+}
+
+.unhidden {
+  display: block;
+}
+
+div.unhidden {
+  overflow: auto;
+  width: 95%;
+}
+
+table {
+  border-collapse: separate;
+  margin: 0 auto 0 auto;
+  &.ini {
+    th {
+      font-family: pakenham;
+      font-size: 20px;
+      text-align: center;
+      color: white;
+      border: 0px;
+      border-radius: 8px 8px 8px 8px;
+      background-color: #363942;
+      padding: 2px 0px 6px 15px;
+      margin-top: 40px;
+      margin-bottom: 23px;
+    }
+    td {
+      vertical-align: top;
+      text-align: left;
+      font-family: arial;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px;
+      line-height: 20px;
+      background-color: #ffffff;
+      -moz-border-radius: 15px;
+      -webkit-border-radius: 15px;
+      border-radius: 15px;
+      border: 2px solid #333029;
+    }
+  }
+}
+
+/* Estilo de las listas que contiene el árbol sintáctico*/
+
+ol {
+  margin-top: -35px;
+  li {
+    vertical-align: middle;
+    text-align: left;
+    font-family: arial;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 20px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    margin: 10px;
+    padding: 10px;
+    &:hover {
+      opacity: 0.6;
+      position: relative;
+      right: 10px;
+      transition: ease-in all 300ms;
+      -moz-transition: ease-in all 300ms;
+      -webkit-transition: ease-in all 300ms;
+    }
+  }
+}
+
+li {
+  &:nth-child(odd) {
+    background-color: #E7FC92;
+  }
+  &:nth-child(even) {
+    background-color: #92F2FC;
+  }
+}

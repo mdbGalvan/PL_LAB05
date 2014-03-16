@@ -1,7 +1,9 @@
 main = ()-> 
+  out.className = "unhidden"
+  $("#INIPUT").html $("#original").val()
   source = original.value
   try 
-    lista = "<<ol> <% _.each(tokens, function(token, index){ %> <li> <%= matches[index] %> </li> <% }); %> </ol>"
+    lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>'
     output_template = _.template(lista)
     matches = []
     tokens = parse(source)
