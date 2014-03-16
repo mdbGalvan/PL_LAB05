@@ -1,7 +1,16 @@
 main = ()-> 
   source = original.value
   try 
-    result = JSON.stringify(parse(source), null, 2)
+    lista = "<<ol> <% _.each(tokens, function(token, index){ %> <li> <%= matches[index] %> </li> <% }); %> </ol>"
+    output_template = _.template(lista)
+    matches = []
+    tokens = parse(source)
+    for i of tokens
+      matches.push JSON.stringify(tokens[i], null, 2)
+    result = output_template(
+                        tokens: tokens
+                        matches: matches
+                      ).substr 1
   catch result
     result = """<div class="error">#{result}</div>"""
 
@@ -27,33 +36,25 @@ RegExp::bexec = (str) ->
   null
 
 String::tokens = ->
-  from = undefined # The index of the start of the token.
-  i = 0 # The index of the current character.
-  n = undefined # The number value.
-  m = undefined # Matching
-  result = [] # An array to hold the results.
-  WHITES = /\s+/g         # Casa con Carácter individual en espacio en blanco
-  ID = /[a-zA-Z_]\w*/g    # Casa con una palabra que contiene letras o dígitos y empieza con letras o _
-  NUM = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g             # Casa con dígitos con coma flotante
-  STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g           # Casa con palabras entre "" ó '', y escapa \", \'
-  ONELINECOMMENT = /\/\/.*/g                          # Casa con // comentario
-  COMPARISONOPERATOR = /[<>=!]=|[<>]/g                # Casa con <=, >=, ==, !=, <>
-  MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g         # /* comentario con multilínea */
-  ONECHAROPERATORS = /([-+*\/%\^=()&|;:,.<>{}[\]])/g  # He añadido ^, % y .
-  tokens = [
-    WHITES
-    ID
-    NUM
-    STRING
-    ONELINECOMMENT
-    MULTIPLELINECOMMENT
-    ONECHAROPERATORS
-  ]
-  RESERVED_WORD = {
-            p: "P",
-            "if": "IF",
-            then: "THEN"
-        };
+  from = undefined                                # The index of the start of the token.
+  i = 0                                           # The index of the current character.
+  n = undefined                                   # The number value.
+  m = undefined                                   # Matching
+  result = []                                     # An array to hold the results.
+  tokens =
+    WHITES: /\s+/g                                # Casa con Carácter individual en espacio en blanco
+    ID: /[a-zA-Z_]\w*/g                           # Casa con una palabra que contiene letras o dígitos y empieza con letras o _
+    NUM: /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g        # Casa con dígitos con coma flotante
+    STRING: /('(\\.|[^'])*'|"(\\.|[^"])*")/g      # Casa con palabras entre "" ó '', y escapa \", \'
+    ONELINECOMMENT: /\/\/.*/g                     # Casa con // comentario
+    MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g    # /* comentario con multilínea */
+    COMPARISONOPERATOR: /[<>=!]=|[<>]/g           # Casa con <=, >=, ==, !=, <>
+    ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
+
+  RESERVED_WORD = 
+    p:    "P"
+    "if": "IF"
+    then: "THEN"
   
   # Make a token object.
   make = (type, value) ->
@@ -66,26 +67,26 @@ String::tokens = ->
     str = m[0]
     i += str.length # Warning! side effect on i
     str
+
   
   # Begin tokenization. If the source string is empty, return nothing.
   return  unless this
   
   # Loop through this text
   while i < @length
-    tokens.forEach (t) -> # Only ECMAScript5
-      t.lastIndex = i
-      return
+    for key, value of tokens
+      value.lastIndex = i
 
     from = i
     
     # Ignore whitespace and comments
-    if m = WHITES.bexec(this) or 
-           (m = ONELINECOMMENT.bexec(this)) or 
-           (m = MULTIPLELINECOMMENT.bexec(this))
+    if m = tokens.WHITES.bexec(this) or 
+           (m = tokens.ONELINECOMMENT.bexec(this)) or 
+           (m = tokens.MULTIPLELINECOMMENT.bexec(this))
       getTok()
     
     # name.
-    else if m = ID.bexec(this)
+    else if m = tokens.ID.bexec(this)
       rw = RESERVED_WORD[m[0]]
       if rw
         result.push make(rw, getTok())
@@ -93,48 +94,57 @@ String::tokens = ->
         result.push make("ID", getTok())
     
     # number.
-    else if m = NUM.bexec(this)
+    else if m = tokens.NUM.bexec(this)
       n = +getTok()
       if isFinite(n)
         result.push make("NUM", n)
       else
         make("NUM", m[0]).error "Bad number"
-
+    
     # string
-    else if m = STRING.bexec(this)
+    else if m = tokens.STRING.bexec(this)
       result.push make("STRING", 
                         getTok().replace(/^["']|["']$/g, ""))
-
-    # comparision
-    else if m = COMPARISONOPERATOR.bexec(this)
+    
+    # comparison operator
+    else if m = tokens.COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
-      
     # single-character operator
-    else if m = ONECHAROPERATORS.bexec(this)
+    else if m = tokens.ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
     else
       throw "Syntax error near '#{@substr(i)}'"
   result
 
 parse = (input) ->
-  tokens = input.tokens()
-  lookahead = tokens.shift()
+  tokens = input.tokens()             # Devuelve los elementos casados: name, number, string, RESERVED_WORD, ...
+  lookahead = tokens.shift()          # Toma el primer elemento casado anteriormente, ahora tokens tiene un menos
+  # *****************************************************************************************************************
+  # MATCH:  Método que el tipo t que se le pasa coincide con el tipo del lookahead, sino devuelve excepción. 
+  #         Útil para saber si no se cierra un ), o falta then, ... Si coincide pasa al sig. objeto casado, y com-
+  #         prueba que éste exista.
+  # *****************************************************************************************************************  
   match = (t) ->
-    if lookahead.type is t
-      lookahead = tokens.shift()
-      lookahead = null  if typeof lookahead is "undefined"
-    else # Error. Throw exception
+    if lookahead.type is t            # Si el tipo del objeto (tomado de tokens) es igual que el que entró
+      lookahead = tokens.shift()      # Toma el siguiente elemento casado, si ya no tenía más
+      lookahead = null  if typeof lookahead is "undefined"    # entra en esta condición
+    else # Error. Throw exception     # Si el tipo no coincide lanza una excepción
       throw "Syntax Error. Expected #{t} found '" + 
             lookahead.value + "' near '" + 
             input.substr(lookahead.from) + "'"
     return
 
+  # *****************************************************************************************************************
+  # STATEMENTS:   A partir de aquí se analiza todo lo casado por tokens, tras hacer la llamada: [statement()]. 
+  #               Luego, se almacenará en tree.
+  # *****************************************************************************************************************
   statements = ->
     result = [statement()]
     while lookahead and lookahead.type is ";"
       match ";"
       result.push statement()
-    (if result.length is 1 then result[0] else result)
+    #(if result.length is 1 then result[0] else result)
+    result
 
   statement = ->
     result = null
@@ -156,12 +166,12 @@ parse = (input) ->
       result =
         type: "P"
         value: right
-    else if lookahead and lookahead.type is "IF"
-      match "IF"
-      left = condition()
-      match "THEN"
-      right = statement()
-      result =
+    else if lookahead and lookahead.type is "IF"  # Si casa con el Tipo if debe seguir unas pautas y se verifica
+      match "IF"                                  # Primero debe casar con IF, y toma la sig.
+      left = condition()                          # Se guarda en left toda la condición, que verifica: exp comp exp
+      match "THEN"                                # Luego, casa con THEN, y toma la sig.
+      right = statement()                         # Se guarda en right todo statement, que cumple: ID, P, ...
+      result =                                    # Se guarda el resultado en result
         type: "IF"
         left: left
         right: right
@@ -171,11 +181,14 @@ parse = (input) ->
         " near '#{input.substr(lookahead.from)}'"
     result
 
+  # *****************************************************************************************************************
+  # CONDITION:  Método que se ejecuta cuando queremos verificar que se cumple una condición del tipo: expr cond expr 
+  # *****************************************************************************************************************
   condition = ->
-    left = expression()
-    type = lookahead.value
-    match "COMPARISON"
-    right = expression()
+    left = expression()                           # Guardamos en left la expresión a la izquierda de la condición
+    type = lookahead.value                        # Se almacena en type el tipo de comparación: ==, <=, >=, ...
+    match "COMPARISON"                            # Se verifica que ahora va la comparación y seguimos al sig.
+    right = expression()                          # Se almacena la expresión a la derecha de la condición
     result =
       type: type
       left: left
@@ -193,6 +206,10 @@ parse = (input) ->
         right: right
     result
 
+  # *****************************************************************************************************************
+  # TERM: Método que se ejecuta al entrar en expression() o si en este método se identifica que existe el sig. y 
+  #       el tipo: *.
+  # *****************************************************************************************************************
   term = ->
     result = factor()
     if lookahead and lookahead.type is "*"
@@ -204,7 +221,11 @@ parse = (input) ->
         right: right
     result
 
-  factor = ->
+  # *****************************************************************************************************************
+  # FACTOR: Método que se ejecuta al entrar en term(). Identifica el tipo: NUM, ID ó (, sino devuelve una excepción.
+  #         Añade el tipo y valor en result. Llama al método match con el tipo identificado para que avance al sig.
+  # *****************************************************************************************************************
+  factor = ->                           
     result = null
     if lookahead.type is "NUM"
       result =
@@ -218,10 +239,10 @@ parse = (input) ->
         value: lookahead.value
 
       match "ID"
-    else if lookahead.type is "("
-      match "("
-      result = expression()
-      match ")"
+    else if lookahead.type is "("               # El lookahead es del tipo "(" entonces tiene que cumplir "expr )"
+      match "("                                 # Casa con ( y sigue con el sig.
+      result = expression()                     # Se idendifica la expresión y se almacena el resultado
+      match ")"                                 # Tiene que cerrar el paréntesis tras la expresión. Y seguimos con el sig.
     else # Throw exception
       throw "Syntax Error. Expected number or identifier or '(' but found " + 
         (if lookahead then lookahead.value else "end of input") + 
