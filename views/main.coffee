@@ -1,7 +1,16 @@
 main = ()-> 
   source = original.value
   try 
-    result = JSON.stringify(parse(source), null, 2)
+    lista = "<<ol> <% _.each(tokens, function(token, index){ %> <li> <%= matches[index] %> </li> <% }); %> </ol>"
+    output_template = _.template(lista)
+    matches = []
+    tokens = parse(source)
+    for i of tokens
+      matches.push JSON.stringify(tokens[i], null, 2)
+    result = output_template(
+                        tokens: tokens
+                        matches: matches
+                      ).substr 1
   catch result
     result = """<div class="error">#{result}</div>"""
 
@@ -134,7 +143,8 @@ parse = (input) ->
     while lookahead and lookahead.type is ";"
       match ";"
       result.push statement()
-    (if result.length is 1 then result[0] else result)
+    #(if result.length is 1 then result[0] else result)
+    result
 
   statement = ->
     result = null
