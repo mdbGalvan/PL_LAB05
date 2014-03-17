@@ -57,8 +57,10 @@ String::tokens = ->
     p:      "P"
     "if":   "IF"
     then:   "THEN"
-    while:  "WHILE"
-    do:     "DO"
+    "while":"WHILE"
+    "do":   "DO"
+    "begin":"BEGIN"
+    "end":  "END"
   
   # Make a token object.
   make = (type, value) ->
@@ -170,6 +172,16 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "BEGIN"
+      match "BEGIN"
+      until lookahead.type is "END"
+        right = statement()
+        match ";" 
+
+      match "END"
+      result =
+        type: "BEGIN"
+        value: right
     else if lookahead and lookahead.type is "IF"  # Si casa con el Tipo if debe seguir unas pautas y se verifica
       match "IF"                                  # Primero debe casar con IF, y toma la sig.
       left = condition()                          # Se guarda en left toda la condición, que verifica: exp comp exp
@@ -180,9 +192,9 @@ parse = (input) ->
         left: left
         right: right
     else if lookahead and lookahead.type is "WHILE"  # Si casa con while debe seguir unas pautas y se verifica
-      match "WHILE"                               # Primero debe casar con IF, y toma la sig.
+      match "WHILE"                               # Primero debe casar con WHILE, y toma la sig.
       left = condition()                          # Se guarda en left toda la condición, que verifica: exp comp exp
-      match "DO"                                  # Luego, casa con THEN, y toma la sig.
+      match "DO"                                  # Luego, casa con DO, y toma la sig.
       right = statement()                         # Se guarda en right todo statement, que cumple: ID, P, ...
       result =                                    # Se guarda el resultado en result
         type: "WHILE"
