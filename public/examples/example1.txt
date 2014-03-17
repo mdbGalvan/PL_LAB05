@@ -1,4 +1,4 @@
 begin 
-if a == 1 then b = 4;
+if a == 1 then call b;
 a = (b + 3) + 3;
 end

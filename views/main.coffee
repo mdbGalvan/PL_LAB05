@@ -61,6 +61,7 @@ String::tokens = ->
     "do":   "DO"
     "begin":"BEGIN"
     "end":  "END"
+    "call": "CALL"
   
   # Make a token object.
   make = (type, value) ->
@@ -172,6 +173,12 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "CALL"
+      match "CALL"
+      match "ID"
+      result =
+        type: "CALL"
+        value: lookahead.value
     else if lookahead and lookahead.type is "BEGIN"
       match "BEGIN"
       until lookahead.type is "END"
