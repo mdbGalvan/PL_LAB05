@@ -1,2 +1,3 @@
 a = 4*2;
-while (b + 1) <= 10 do p a
+while (b + 1) <= 10 do p a;
+if (a / b - b * (b / c)) == (a * a + b) then p a

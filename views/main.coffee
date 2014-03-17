@@ -195,7 +195,8 @@ parse = (input) ->
     result
 
   # *****************************************************************************************************************
-  # CONDITION:  Método que se ejecuta cuando queremos verificar que se cumple una condición del tipo: expr cond expr 
+  # CONDITION:  Método que se ejecuta cuando queremos verificar que se cumple una condición del tipo: expr cond expr.
+  #             Útil para el if, while, ...
   # *****************************************************************************************************************
   condition = ->
     left = expression()                           # Guardamos en left la expresión a la izquierda de la condición
@@ -208,6 +209,11 @@ parse = (input) ->
       right: right
     result
 
+  # *****************************************************************************************************************
+  # EXPRESSION: Método que ejecutará primero term() en busca de una expresión del tipo: ID|NUM|() y un operador *|/.
+  #             Luego, mira si casa con +|- y vuelve hacer la misma búsqueda de nuevo. Haciendo posible que exista 
+  #             Una expresión enorme, una dentro de otras, con: +-*/ ID, NUM y ()   
+  # *****************************************************************************************************************
   expression = ->
     result = term()
     if lookahead and lookahead.type is "+"
@@ -217,11 +223,18 @@ parse = (input) ->
         type: "+"
         left: result
         right: right
+    else if lookahead and lookahead.type is "-"
+      match "-"
+      right = expression()
+      result =
+        type: "-"
+        left: result
+        right: right
     result
 
   # *****************************************************************************************************************
   # TERM: Método que se ejecuta al entrar en expression() o si en este método se identifica que existe el sig. y 
-  #       el tipo: *.
+  #       el tipo: * y /.
   # *****************************************************************************************************************
   term = ->
     result = factor()
@@ -230,6 +243,13 @@ parse = (input) ->
       right = term()
       result =
         type: "*"
+        left: result
+        right: right
+    else if lookahead and lookahead.type is "/"
+      match "/"
+      right = term()
+      result =
+        type: "/"
         left: result
         right: right
     result
