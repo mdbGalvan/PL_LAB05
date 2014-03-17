@@ -54,9 +54,11 @@ String::tokens = ->
     ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
 
   RESERVED_WORD = 
-    p:    "P"
-    "if": "IF"
-    then: "THEN"
+    p:      "P"
+    "if":   "IF"
+    then:   "THEN"
+    while:  "WHILE"
+    do:     "DO"
   
   # Make a token object.
   make = (type, value) ->
@@ -175,6 +177,15 @@ parse = (input) ->
       right = statement()                         # Se guarda en right todo statement, que cumple: ID, P, ...
       result =                                    # Se guarda el resultado en result
         type: "IF"
+        left: left
+        right: right
+    else if lookahead and lookahead.type is "WHILE"  # Si casa con while debe seguir unas pautas y se verifica
+      match "WHILE"                               # Primero debe casar con IF, y toma la sig.
+      left = condition()                          # Se guarda en left toda la condición, que verifica: exp comp exp
+      match "DO"                                  # Luego, casa con THEN, y toma la sig.
+      right = statement()                         # Se guarda en right todo statement, que cumple: ID, P, ...
+      result =                                    # Se guarda el resultado en result
+        type: "WHILE"
         left: left
         right: right
     else # Error!
