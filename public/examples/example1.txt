@@ -1,4 +1,5 @@
 begin 
 if a == 1 then call b;
 a = (b + 3) + 3;
-end
+end;
+a = b

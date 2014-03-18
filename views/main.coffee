@@ -142,11 +142,12 @@ parse = (input) ->
     return
 
   # *****************************************************************************************************************
-  # STATEMENTS:   A partir de aquí se analiza todo lo casado por tokens, tras hacer la llamada: [statement()]. 
+  # STATEMENTS:   A partir de aquí se analiza todo lo casado por tokens, tras hacer la llamada: [statement()],
+  #               esta sentencia es n-aria y tiene un array de hijos. Va empujando los árboles en el array.
   #               Luego, se almacenará en tree.
   # *****************************************************************************************************************
   statements = ->
-    result = [statement()]
+    result = [statement()]                                # Array de hijos, n-aria
     while lookahead and lookahead.type is ";"
       match ";"
       result.push statement()
@@ -175,15 +176,18 @@ parse = (input) ->
         value: right
     else if lookahead and lookahead.type is "CALL"
       match "CALL"
+      if lookahead.type is "ID"
+        result =
+          type: "CALL"
+          value: lookahead.value
+
       match "ID"
-      result =
-        type: "CALL"
-        value: lookahead.value
     else if lookahead and lookahead.type is "BEGIN"
       match "BEGIN"
       until lookahead.type is "END"
-        right = statement()
-        match ";" 
+        right = [statement()]
+        match ";"
+        right.push statement()
 
       match "END"
       result =
