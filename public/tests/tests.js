@@ -8,3 +8,114 @@ suite('PRUEBAS PARA EL LOCALSTORAGE', function() {
 		}
 	});
 });
+
+suite('PRUEBAS PARA BEXEC()', function() {
+	setup(function(){
+		var str;
+		var re;
+	});
+	test('NULL', function() {
+		str = "dBdXXXXDBBD";
+		re = /d(b+)(d)/ig;
+		re.lastIndex = 3;
+		assert.equal(re.bexec(str), null, 'lastIndex = 3 <> 4 = index');
+    });	
+	test('m', function() {
+		str = "dBdXXXXDBBD";
+		re = /d(b+)(d)/ig;
+		re.lastIndex = 7;
+		assert.isArray(re.bexec(str), '["DBBD", "BB", "D", index: 7, input: "dBdXXXXDBBD"]');
+		re.lastIndex = 7;
+		assert.notEqual(re.bexec(str), null, '["DBBD", "BB", "D", index: 7, input: "dBdXXXXDBBD"]');
+    });	
+});
+
+suite('PRUEBAS PARA LA TOKENS()', function() {
+	test('Asignación', function() {
+		source = 'a = 2*4';
+        tokens = source.tokens();
+		assert.isArray(tokens, 'Casó con los tipos: id, =, num, *, num.');
+		assert.equal(tokens[2].type, 'NUM');
+	});	
+	test('RESERVED_WORD: Call', function() {
+		source = 'call b';
+        tokens = source.tokens();
+		assert.isArray(tokens, 'El resultado es un array de dos objetos.');
+		assert.equal(tokens[0].type, 'CALL');
+		assert.equal(tokens[1].type, 'ID');
+	});	
+	test('Comentario', function() {
+		source = '// Comentario';
+        tokens = source.tokens();
+		assert.deepEqual(tokens, [], 'Devuelve el JSON vacío xq los comentarios no los incluye');
+    });	
+});
+
+suite('PRUEBAS PARA DUMP_GET() Y DUMP_AJAX()', function() {
+	test('GET', function() {
+		dump_get('/examples/example1.txt');
+		assert.isString($("#original").val());
+    });	
+	test('AJAX', function() {
+		dump_ajax('/examples/example2.txt');
+		assert.isString($("#original").val());
+    });	
+});
+
+suite('PRUEBAS PARA LA MAIN()', function() {
+	test('If', function() {
+		original.value = 'if a == 1 then call b';
+        window.main();
+		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="0"> {\n  "type": "IF",\n  "left": {\n    "type": "==",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "NUM",\n      "value": 1\n    }\n  },\n  "right": {\n    "type": "CALL",\n    "value": "b"\n  }\n} </li>  </ol>');
+    });	
+	test('Call', function() {
+		original.value = 'call b';
+        window.main();
+		assert.equal(OUTPUT.innerHTML, '<ol>  <li class="0"> {\n  "type": "CALL",\n  "value": "b"\n} </li>  </ol>');
+    });	
+});
+
+suite('PRUEBAS PARA LA PARSE()', function() {
+	test('While', function() {
+		var source = 'while a == b do b = 2';
+		var tokens;
+		try {
+			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
+      		output_template = _.template(lista);
+		    matches = [];
+		    tokens = window.parse(source);
+		    for (i in tokens) {
+		    	matches.push(JSON.stringify(tokens[i], null, 2));
+		    }
+		    result = output_template({
+		    	tokens: tokens,
+		    	matches: matches
+		    }).substr(1);
+	    } catch (_error) {
+	      result = _error;
+	      result = "<div class=\"error\">" + result + "</div>";
+	    }
+		assert.equal(result,'<ol>  <li class="0"> {\n  "type": "WHILE",\n  "left": {\n    "type": "==",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "ID",\n      "value": "b"\n    }\n  },\n  "right": {\n    "type": "=",\n    "left": {\n      "type": "ID",\n      "value": "b"\n    },\n    "right": {\n      "type": "NUM",\n      "value": 2\n    }\n  }\n} </li>  </ol>');
+    });
+	test('Begin', function() {
+		var source = 'begin \n a = b \n end';
+		var tokens;
+		try {
+			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
+      		output_template = _.template(lista);
+		    matches = [];
+		    tokens = window.parse(source);
+		    for (i in tokens) {
+		    	matches.push(JSON.stringify(tokens[i], null, 2));
+		    }
+		    result = output_template({
+		    	tokens: tokens,
+		    	matches: matches
+		    }).substr(1);
+	    } catch (_error) {
+	      result = _error;
+	      result = "<div class=\"error\">" + result + "</div>";
+	    }
+		assert.equal(result,'');    
+	});
+});

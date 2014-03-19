@@ -18,6 +18,8 @@ main = ()->
 
   OUTPUT.innerHTML = result
 
+window.main = main
+
 window.onload = ()-> 
   PARSE.onclick = main
   if window.localStorage and localStorage.original
@@ -311,3 +313,5 @@ parse = (input) ->
       "Expected 'end of input' and found '" + 
       input.substr(lookahead.from) + "'"  
   tree
+
+window.parse = parse
