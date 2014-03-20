@@ -13,6 +13,8 @@ body
       br
       div
         .loadfile
+          div
+            | Examples Files 
           button#example1[type="button" onclick="dump_ajax('/examples/example1.txt');"]
             | example1
           button#example2[type="button" onclick="dump_get('/examples/example2.txt');"]
@@ -42,6 +44,8 @@ body
                     }
             });
           }
+
+    br
 
     input#PARSE.mylink[value="parse" type="button"]
     #out.hidden

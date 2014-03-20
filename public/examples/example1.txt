@@ -1,5 +1,6 @@
-begin 
-if a == 1 then call b;
-a = (b + 3) + 3
+var a, b, c;
+begin
+if a == b then call b;
+a = b + 3
 end;
 a = b
