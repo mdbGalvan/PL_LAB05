@@ -54,16 +54,22 @@ String::tokens = ->
     MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g    # /* comentario con multilínea */
     COMPARISONOPERATOR: /[<>=!]=|[<>]/g           # Casa con <=, >=, ==, !=, <>
     ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
+    ADDOP: /[+-]/g                                # Casa con + o -, útil para expression()
+    MULTOP: /[*\/]/g                              # Casa con * o /, útil para term()
 
   RESERVED_WORD = 
-    p:      "P"
-    "if":   "IF"
-    then:   "THEN"
-    "while":"WHILE"
-    "do":   "DO"
-    "begin":"BEGIN"
-    "end":  "END"
-    "call": "CALL"
+    p:         "P"
+    "if":       "IF"
+    then:       "THEN"
+    "while":    "WHILE"
+    "do":       "DO"
+    "begin":    "BEGIN"
+    "end":      "END"
+    "call":     "CALL"
+    "const":    "CONST"
+    "var":      "VAR"
+    "procedure":"PROCEDURE"
+
   
   # Make a token object.
   make = (type, value) ->
@@ -118,6 +124,15 @@ String::tokens = ->
     # comparison operator
     else if m = tokens.COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
+      
+    # addop
+    else if m = tokens.ADDOP.bexec(this)
+      result.push make("ADDOP", getTok())
+    
+    # multop
+    else if m = tokens.MULTOP.bexec(this)
+      result.push make("MULTOP", getTok())
+
     # single-character operator
     else if m = tokens.ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -149,13 +164,68 @@ parse = (input) ->
   #               Luego, se almacenará en tree.
   # *****************************************************************************************************************
   statements = ->
-    result = [statement()]                                # Array de hijos, n-aria
+    result = [block()]                                    # Array de hijos, n-aria
     while lookahead and lookahead.type is ";"
       match ";"
-      result.push statement()
+      result.push block()
     #(if result.length is 1 then result[0] else result)
     result
 
+  # *****************************************************************************************************************
+  # BLOCK:   
+  # *****************************************************************************************************************
+  block = ->
+    result = null
+    if lookahead and lookahead.type is "CONST"    
+      while lookahead and (lookahead.type is "CONST" or lookahead.type is ",")
+        if lookahead.type is "CONST"
+          match "CONST"
+        else if lookahead.type is ","
+          match ","
+        left =
+          type: "ID"
+          value: lookahead.value
+        match "ID"
+        match "="
+        right =
+          type: "NUM"
+          value: lookahead.value
+        match "NUM"
+        result =
+          type: "CONST"
+          left: left
+          right: right   
+        result
+    else if lookahead and lookahead.type is "VAR"    
+      while lookahead and (lookahead.type is "VAR" or lookahead.type is ",")
+        if lookahead.type is "VAR"
+          match "VAR"
+        else if lookahead.type is ","
+          match ","
+        result =
+          type: "VAR"
+          value: lookahead.value
+        match "ID"
+        result
+    else if lookahead and lookahead.type is "PROCEDURE"    
+      match "PROCEDURE"
+      left = lookahead.value
+      match ";"
+      right = block()
+      match ";"
+      result1 =
+        left: left
+        right: right
+      result
+        left: result1
+        right: statement()
+      result       
+    else      
+      result = [statement()]
+
+  # *****************************************************************************************************************
+  # STATEMENTS:   
+  # *****************************************************************************************************************
   statement = ->
     result = null
     if lookahead and lookahead.type is "ID"
@@ -241,18 +311,12 @@ parse = (input) ->
   # *****************************************************************************************************************
   expression = ->
     result = term()
-    if lookahead and lookahead.type is "+"
-      match "+"
-      right = expression()
+    while lookahead and lookahead.type is "ADDOP"
+      type = lookahead.value
+      match "ADDOP"
+      right = term()
       result =
-        type: "+"
-        left: result
-        right: right
-    else if lookahead and lookahead.type is "-"
-      match "-"
-      right = expression()
-      result =
-        type: "-"
+        type: type
         left: result
         right: right
     result
@@ -263,18 +327,12 @@ parse = (input) ->
   # *****************************************************************************************************************
   term = ->
     result = factor()
-    if lookahead and lookahead.type is "*"
-      match "*"
-      right = term()
+    while lookahead and lookahead.type is "MULTOP"
+      type = lookahead.value
+      match "MULTOP"
+      right = factor()
       result =
-        type: "*"
-        left: result
-        right: right
-    else if lookahead and lookahead.type is "/"
-      match "/"
-      right = term()
-      result =
-        type: "/"
+        type: type
         left: result
         right: right
     result

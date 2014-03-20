@@ -1,10 +1,12 @@
 # Resumen
 
-Tras la [práctica 4](http://pl-lab04.herokuapp.com/), la siguiente fase en la construcción del *analizador* es la fase de *análisis sintáctico*. Esta toma como entrada el flujo de terminales y construye como salida el *árbol de análisis sintáctico abstracto*.
+Tras la [práctica 4](http://pl-lab04.herokuapp.com/), la siguiente fase en la construcción del *analizador* es la fase de *análisis sintáctico*. Esta toma como entrada el flujo de terminales y construye como salida el *árbol de análisis sintáctico abstracto* concretamente para la EBNF-like grammar (for **Niklaus Wirth's** PL/0 programming language).
 
 El *árbol de análisis sintáctico abstracto* es una representación compactada del árbol de análisis sintáctico concreto que contiene la misma información que éste.
 
 Existen diferentes *métodos* de *análisis sintáctico*. La mayoría caen en una de dos categorías: *ascendentes* y *descendentes*. Los *ascendentes* construyen el árbol desde las hojas hacia la raíz. Los *descendentes* lo hacen en modo inverso. El que describiremos aquí es uno de los mas sencillos: se denomina **Método de Análisis Predictivo Descendente Recursivo**.
+
+![alt text](http://pl-lab05.herokuapp.com/images/PL0.png "PL/0")
 
 # Motivación
 
@@ -41,7 +43,6 @@ Pueden ejecutarse las pruebas [aquí](http://pl-lab05.herokuapp.com/tests) **EN 
 | Autores | E-mail |
 | ---------- | ---------- |
 | María D. Batista Galván   | magomenlopark@gmail.com  |
-| Itahisa M. Díaz Díaz      | itahisadiaz@gmail.com   |
 
 
 # Licencia
