@@ -62,20 +62,20 @@ suite('PRUEBAS PARA DUMP_GET() Y DUMP_AJAX()', function() {
     });	
 });
 
-suite('PRUEBAS PARA LA MAIN()', function() {
+suite('PRUEBAS PARA MAIN()', function() {
 	test('If', function() {
 		original.value = 'if a == 1 then call b';
         window.main();
-		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="0"> {\n  "type": "IF",\n  "left": {\n    "type": "==",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "NUM",\n      "value": 1\n    }\n  },\n  "right": {\n    "type": "CALL",\n    "value": "b"\n  }\n} </li>  </ol>');
+		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "IF",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 1\n      }\n    },\n    "right": {\n      "type": "CALL",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');
     });	
 	test('Call', function() {
 		original.value = 'call b';
         window.main();
-		assert.equal(OUTPUT.innerHTML, '<ol>  <li class="0"> {\n  "type": "CALL",\n  "value": "b"\n} </li>  </ol>');
+		assert.equal(OUTPUT.innerHTML, '<ol>  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
     });	
 });
 
-suite('PRUEBAS PARA LA PARSE()', function() {
+suite('PRUEBAS PARA PARSE()', function() {
 	test('While', function() {
 		var source = 'while a == b do b = 2';
 		var tokens;
@@ -95,10 +95,10 @@ suite('PRUEBAS PARA LA PARSE()', function() {
 	      result = _error;
 	      result = "<div class=\"error\">" + result + "</div>";
 	    }
-		assert.equal(result,'<ol>  <li class="0"> {\n  "type": "WHILE",\n  "left": {\n    "type": "==",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "ID",\n      "value": "b"\n    }\n  },\n  "right": {\n    "type": "=",\n    "left": {\n      "type": "ID",\n      "value": "b"\n    },\n    "right": {\n      "type": "NUM",\n      "value": 2\n    }\n  }\n} </li>  </ol>');
+		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "WHILE",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "ID",\n        "value": "b"\n      }\n    },\n    "right": {\n      "type": "=",\n      "left": {\n        "type": "ID",\n        "value": "b"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 2\n      }\n    }\n  }\n] </li>  </ol>');
     });
 	test('Begin', function() {
-		var source = 'begin \n a = b \n end';
+		var source = "begin \n call b;\n a = b end";
 		var tokens;
 		try {
 			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
@@ -116,6 +116,62 @@ suite('PRUEBAS PARA LA PARSE()', function() {
 	      result = _error;
 	      result = "<div class=\"error\">" + result + "</div>";
 	    }
-		assert.equal(result,'');    
+		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "BEGIN",\n    "value": [\n      {\n        "type": "CALL",\n        "value": "b"\n      },\n      {\n        "type": "=",\n        "left": {\n          "type": "ID",\n          "value": "a"\n        },\n        "right": {\n          "type": "ID",\n          "value": "b"\n        }\n      }\n    ]\n  }\n] </li>  </ol>');    
 	});
+	test('Var', function() {
+		var source = "var a, b;\n begin \n call b;\n a = b end";
+		var tokens;
+		try {
+			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
+      		output_template = _.template(lista);
+		    matches = [];
+		    tokens = window.parse(source);
+		    for (i in tokens) {
+		    	matches.push(JSON.stringify(tokens[i], null, 2));
+		    }
+		    result = output_template({
+		    	tokens: tokens,
+		    	matches: matches
+		    }).substr(1);
+	    } catch (_error) {
+	      result = _error;
+	      result = "<div class=\"error\">" + result + "</div>";
+	    }
+		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "VAR",\n    "value": "a"\n  },\n  {\n    "type": "VAR",\n    "value": "b"\n  }\n] </li>  <li class="1"> [\n  {\n    "type": "BEGIN",\n    "value": [\n      {\n        "type": "CALL",\n        "value": "b"\n      },\n      {\n        "type": "=",\n        "left": {\n          "type": "ID",\n          "value": "a"\n        },\n        "right": {\n          "type": "ID",\n          "value": "b"\n        }\n      }\n    ]\n  }\n] </li>  </ol>');    
+	});
+});
+
+suite('PRUEBAS PARA COMPROBAR ERRORES', function() {	
+	test('Operador - main()', function() {
+		original.value = 'a = 2 + (3';
+        main();
+		assert.match(OUTPUT.innerHTML, /error/);
+	});
+
+	test('Id - main()', function() {
+		original.value = '1$%&· = 5 + 3;';
+        main();
+		assert.match(OUTPUT.innerHTML, /error/);
+	});
+	test('While - parse()', function() {
+		var source = "while 2 == 3";
+		var tokens;
+		try {
+			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
+      		output_template = _.template(lista);
+		    matches = [];
+		    tokens = window.parse(source);
+		    for (i in tokens) {
+		    	matches.push(JSON.stringify(tokens[i], null, 2));
+		    }
+		    result = output_template({
+		    	tokens: tokens,
+		    	matches: matches
+		    }).substr(1);
+	    } catch (_error) {
+	      result = _error;
+	      result = "<div class=\"error\">" + result + "</div>";
+	    }
+		assert.match(OUTPUT.innerHTML, /error/);
+    });	
 });
