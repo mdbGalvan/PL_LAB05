@@ -1,15 +1,27 @@
+/* FUENTES */
+@font-face {
+  font-family: almendra;
+  src: url(fonts/Almendra-Bold.otf) format('truetype');
+}
+@font-face {
+    font-family: pakenham;
+  src: url(fonts/pakenham.ttf) format('truetype');
+}
+
 $red: #903;
 $black: #444;
 $white: #fff;
 $blue: #002EB8;
-$main-font: pakenham;
-$font-txtarea: Fixed, monospace;
+$main-font: Arial;
+$txtarea-font: Arial;
+$h-font: almendra;
 $width: 1110px;
+
 
 body {
   font-family: $main-font;
   background: #C9C9C9;/*#C29957;*/
-  background-image:url('images/fondo1.jpg');
+  background-image: url('images/fondo1.jpg');
   min-width: 450px;
   max-width: $width;
   margin: 0 auto;
@@ -18,15 +30,23 @@ body {
 
 h1 {
   color: $white;
-  font: 32px/1 $main-font;
+  font: 32px/1 $h-font;
 }
 
 header h1 {
   font-size: 40px;
-  line-height: 80px;
-  background: transparent url(/images/logo.png) 0 0 no-repeat;
-  background-size:5% 70%;
-  padding-left: 84px;
+  text-align: center;
+  color: black;
+  padding-bottom: 10px;
+}
+
+header img {
+  display:block;
+  margin:auto;
+  width: 10%;
+  height: 10%;
+  padding-top: 20px;
+  margin-bottom: -30px; 
 }
 
 @mixin tabs ($background: blue, $color: yellow, $hover: black) {
@@ -147,7 +167,7 @@ table {
       margin-bottom: 23px;
     }
     td {
-      font-family: $font-txtarea;
+      font-family: $txtarea-font;
       color: $black;
       vertical-align: top;
       text-align: left;
@@ -171,7 +191,7 @@ ol {
   margin-top: -35px;
   color: $black;
   li {
-    font-family: $font-txtarea;
+    font-family: $txtarea-font;
     vertical-align: middle;
     text-align: left;
     font-family: arial;
