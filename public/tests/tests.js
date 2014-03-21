@@ -64,20 +64,20 @@ suite('PRUEBAS PARA DUMP_GET() Y DUMP_AJAX()', function() {
 
 suite('PRUEBAS PARA MAIN()', function() {
 	test('If', function() {
-		original.value = 'if a == 1 then call b';
+		original.value = "begin\n if a == 1 then call b\n end.";
         window.main();
 		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "IF",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 1\n      }\n    },\n    "right": {\n      "type": "CALL",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');
     });	
 	test('Call', function() {
-		original.value = 'call b';
+		original.value = "begin\n call b\n end.";
         window.main();
-		assert.equal(OUTPUT.innerHTML, '<ol>  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
+		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
     });	
 });
 
 suite('PRUEBAS PARA PARSE()', function() {
 	test('While', function() {
-		var source = 'while a == b do b = 2';
+		var source = 'while a == b do b = 2.';
 		var tokens;
 		try {
 			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
@@ -95,10 +95,10 @@ suite('PRUEBAS PARA PARSE()', function() {
 	      result = _error;
 	      result = "<div class=\"error\">" + result + "</div>";
 	    }
-		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "WHILE",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "ID",\n        "value": "b"\n      }\n    },\n    "right": {\n      "type": "=",\n      "left": {\n        "type": "ID",\n        "value": "b"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 2\n      }\n    }\n  }\n] </li>  </ol>');
+		assert.equal(result,'<ol>  <li class="0"> {\n  "type": "WHILE",\n  "left": {\n    "type": "==",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "ID",\n      "value": "b"\n    }\n  },\n  "right": {\n    "type": "=",\n    "left": {\n      "type": "ID",\n      "value": "b"\n    },\n    "right": {\n      "type": "NUM",\n      "value": 2\n    }\n  }\n} </li>  </ol>');
     });
 	test('Begin', function() {
-		var source = "begin \n call b;\n a = b end";
+		var source = "begin \n call b;\n a = b end.";
 		var tokens;
 		try {
 			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
@@ -116,10 +116,10 @@ suite('PRUEBAS PARA PARSE()', function() {
 	      result = _error;
 	      result = "<div class=\"error\">" + result + "</div>";
 	    }
-		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "BEGIN",\n    "value": [\n      {\n        "type": "CALL",\n        "value": "b"\n      },\n      {\n        "type": "=",\n        "left": {\n          "type": "ID",\n          "value": "a"\n        },\n        "right": {\n          "type": "ID",\n          "value": "b"\n        }\n      }\n    ]\n  }\n] </li>  </ol>');    
+		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  },\n  {\n    "type": "=",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "ID",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');    
 	});
 	test('Var', function() {
-		var source = "var a, b;\n begin \n call b;\n a = b end";
+		var source = "var a, b;\n begin \n call b;\n a = b end.";
 		var tokens;
 		try {
 			lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="<%= index %>"> <%= matches[index] %> </li> <% }); %> </ol>';
@@ -137,7 +137,7 @@ suite('PRUEBAS PARA PARSE()', function() {
 	      result = _error;
 	      result = "<div class=\"error\">" + result + "</div>";
 	    }
-		assert.equal(result,'<ol>  <li class="0"> [\n  {\n    "type": "VAR",\n    "value": "a"\n  },\n  {\n    "type": "VAR",\n    "value": "b"\n  }\n] </li>  <li class="1"> [\n  {\n    "type": "BEGIN",\n    "value": [\n      {\n        "type": "CALL",\n        "value": "b"\n      },\n      {\n        "type": "=",\n        "left": {\n          "type": "ID",\n          "value": "a"\n        },\n        "right": {\n          "type": "ID",\n          "value": "b"\n        }\n      }\n    ]\n  }\n] </li>  </ol>');    
+		assert.equal(result,'<ol>  <li class="0"> {\n  "type": "VAR ID",\n  "value": "a"\n} </li>  <li class="1"> {\n  "type": "VAR ID",\n  "value": "b"\n} </li>  <li class="2"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  },\n  {\n    "type": "=",\n    "left": {\n      "type": "ID",\n      "value": "a"\n    },\n    "right": {\n      "type": "ID",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');   
 	});
 });
 

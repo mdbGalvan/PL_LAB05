@@ -17,6 +17,9 @@ main = ()->
     result = """<div class="error">#{result}</div>"""
 
   OUTPUT.innerHTML = result
+  if window.localStorage
+    localStorage.original = original.value
+    localStorage.output = result;
 
 window.main = main
 
@@ -24,9 +27,14 @@ window.onload = ()->
   PARSE.onclick = main
   if window.localStorage and localStorage.original
     $("#original").val localStorage.original
+    out.className = "unhidden"
+    $("#INIPUT").html $("#original").val()
+    OUTPUT.innerHTML = localStorage.output
   else
-    $("#original").val "b = 5 + y"
-
+    $("#original").val "BEGIN\n a = a + 1\nEND."
+    out.className = "unhidden"
+    $("#INIPUT").html $("#original").val()
+    
 Object.constructor::error = (message, t) ->
   t = t or this
   t.name = "SyntaxError"
@@ -53,23 +61,35 @@ String::tokens = ->
     ONELINECOMMENT: /\/\/.*/g                     # Casa con // comentario
     MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g    # /* comentario con multilínea */
     COMPARISONOPERATOR: /[<>=!]=|[<>]/g           # Casa con <=, >=, ==, !=, <>
-    ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
+    ONECHAROPERATORS: /([=()&|;:,\.<>{}[\]])/g
     ADDOP: /[+-]/g                                # Casa con + o -, útil para expression()
     MULTOP: /[*\/]/g                              # Casa con * o /, útil para term()
 
-  RESERVED_WORD = 
-    p:         "P"
+  RESERVED_WORD =
+    p:          "P"
+    P:          "P"
     "if":       "IF"
+    "IF":       "IF"
     then:       "THEN"
+    THEN:       "THEN"
     "while":    "WHILE"
+    "WHILE":    "WHILE"
     "do":       "DO"
+    "DO":       "DO"
     "begin":    "BEGIN"
+    "BEGIN":    "BEGIN"
     "end":      "END"
+    "END":      "END"
     "call":     "CALL"
+    "CALL":     "CALL"
     "const":    "CONST"
+    "CONST":    "CONST"
     "var":      "VAR"
+    "VAR":      "VAR"
     "procedure":"PROCEDURE"
-
+    "PROCEDURE":"PROCEDURE"
+    "odd":      "ODD"
+    "ODD":      "ODD"
   
   # Make a token object.
   make = (type, value) ->
@@ -124,7 +144,7 @@ String::tokens = ->
     # comparison operator
     else if m = tokens.COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
-      
+    
     # addop
     else if m = tokens.ADDOP.bexec(this)
       result.push make("ADDOP", getTok())
@@ -132,7 +152,7 @@ String::tokens = ->
     # multop
     else if m = tokens.MULTOP.bexec(this)
       result.push make("MULTOP", getTok())
-
+    
     # single-character operator
     else if m = tokens.ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -149,14 +169,110 @@ parse = (input) ->
   #         prueba que éste exista.
   # *****************************************************************************************************************  
   match = (t) ->
-    if lookahead.type is t            # Si el tipo del objeto (tomado de tokens) es igual que el que entró
-      lookahead = tokens.shift()      # Toma el siguiente elemento casado, si ya no tenía más
-      lookahead = null  if typeof lookahead is "undefined"    # entra en esta condición
-    else # Error. Throw exception     # Si el tipo no coincide lanza una excepción
+    if lookahead.type is t
+      lookahead = tokens.shift()
+      lookahead = null  if typeof lookahead is "undefined"
+    else # Error. Throw exception
       throw "Syntax Error. Expected #{t} found '" + 
             lookahead.value + "' near '" + 
             input.substr(lookahead.from) + "'"
     return
+
+  # *****************************************************************************************************************
+  # PROGRAM:   
+  # *****************************************************************************************************************
+  program = ->
+    result = block()
+    if lookahead and lookahead.type is "."
+      match "."
+    else
+      throw "Syntax Error. Expected '.' Remember to end
+                 your program with a ."
+    result
+
+  # *****************************************************************************************************************
+  # BLOCK:   
+  # *****************************************************************************************************************
+  block = ->
+    results = []
+    if lookahead and lookahead.type is "CONST"
+       match "CONST"
+       constant = ->
+         result = null
+         if lookahead and lookahead.type is "ID"
+           left =
+             type: "CONST ID"
+             value: lookahead.value
+           match "ID"
+           match "="
+           if lookahead and lookahead.type is "NUM"
+             right =
+               type: "NUM"
+               value: lookahead.value
+             match "NUM"
+           else # Error!
+             throw "Syntax Error. Expected NUM but found " + 
+                   (if lookahead then lookahead.value else "end of input") + 
+                   " near '#{input.substr(lookahead.from)}'"
+         else # Error!
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
+         result =
+           type: "="
+           left: left
+           right: right
+         result
+       results.push constant()
+       while lookahead and lookahead.type is ","
+         match ","
+         results.push constant()
+       match ";"
+    
+    if lookahead and lookahead.type is "VAR"
+       match "VAR"
+       variable = ->
+         result = null
+         if lookahead and lookahead.type is "ID"
+           result =
+             type: "VAR ID"
+             value: lookahead.value
+           match "ID"
+         else # Error!
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
+         result
+       results.push variable()
+       while lookahead and lookahead.type is ","
+         match ","
+         results.push variable()
+       match ";"
+  
+  # *****************************************************************************************************************
+  # PROCEDURE:   
+  # *****************************************************************************************************************
+    procedure = ->
+      result = null
+      match "PROCEDURE"
+      if lookahead and lookahead.type is "ID"
+        value = lookahead.value
+        match "ID"
+        match ";"
+        result =
+          type: "PROCEDURE"
+          value: value
+          left: block()
+        match ";"
+      else # Error!
+        throw "Syntax Error. Expected ID but found " + 
+              (if lookahead then lookahead.value else "end of input") + 
+              " near '#{input.substr(lookahead.from)}'"
+      result
+    while lookahead and lookahead.type is "PROCEDURE"
+      results.push procedure()
+    results.push statement()
+    results
 
   # *****************************************************************************************************************
   # STATEMENTS:   A partir de aquí se analiza todo lo casado por tokens, tras hacer la llamada: [statement()],
@@ -164,64 +280,11 @@ parse = (input) ->
   #               Luego, se almacenará en tree.
   # *****************************************************************************************************************
   statements = ->
-    result = [block()]                                    # Array de hijos, n-aria
+    result = [statement()]                                    # Array de hijos, n-aria
     while lookahead and lookahead.type is ";"
       match ";"
-      result.push block()
-    #(if result.length is 1 then result[0] else result)
-    result
-
-  # *****************************************************************************************************************
-  # BLOCK:   
-  # *****************************************************************************************************************
-  block = ->
-    result = null
-    if lookahead and lookahead.type is "CONST"    
-      while lookahead and (lookahead.type is "CONST" or lookahead.type is ",")
-        if lookahead.type is "CONST"
-          match "CONST"
-        else if lookahead.type is ","
-          match ","
-        left =
-          type: "ID"
-          value: lookahead.value
-        match "ID"
-        match "="
-        right =
-          type: "NUM"
-          value: lookahead.value
-        match "NUM"
-        result =
-          type: "CONST"
-          left: left
-          right: right   
-        result
-    else if lookahead and lookahead.type is "VAR"    
-      while lookahead and (lookahead.type is "VAR" or lookahead.type is ",")
-        if lookahead.type is "VAR"
-          match "VAR"
-        else if lookahead.type is ","
-          match ","
-        result =
-          type: "VAR"
-          value: lookahead.value
-        match "ID"
-        result
-    else if lookahead and lookahead.type is "PROCEDURE"    
-      match "PROCEDURE"
-      left = lookahead.value
-      match ";"
-      right = block()
-      match ";"
-      result1 =
-        left: left
-        right: right
-      result
-        left: result1
-        right: statement()
-      result       
-    else      
-      result = [statement()]
+      result.push statement()
+    (if result.length is 1 then result[0] else result)
 
   # *****************************************************************************************************************
   # STATEMENTS:   
@@ -232,7 +295,6 @@ parse = (input) ->
       left =
         type: "ID"
         value: lookahead.value
-
       match "ID"
       match "="
       right = expression()
@@ -248,23 +310,17 @@ parse = (input) ->
         value: right
     else if lookahead and lookahead.type is "CALL"
       match "CALL"
-      if lookahead.type is "ID"
-        result =
-          type: "CALL"
-          value: lookahead.value
-
+      result =
+        type: "CALL"
+        value: lookahead.value
       match "ID"
     else if lookahead and lookahead.type is "BEGIN"
       match "BEGIN"
-      until lookahead.type is "END"
-        right = [statement()]
+      result = [statement()]
+      while lookahead and lookahead.type is ";"
         match ";"
-        right.push statement()
-
+        result.push statement()
       match "END"
-      result =
-        type: "BEGIN"
-        value: right
     else if lookahead and lookahead.type is "IF"  # Si casa con el Tipo if debe seguir unas pautas y se verifica
       match "IF"                                  # Primero debe casar con IF, y toma la sig.
       left = condition()                          # Se guarda en left toda la condición, que verifica: exp comp exp
@@ -285,8 +341,8 @@ parse = (input) ->
         right: right
     else # Error!
       throw "Syntax Error. Expected identifier but found " + 
-        (if lookahead then lookahead.value else "end of input") + 
-        " near '#{input.substr(lookahead.from)}'"
+            (if lookahead then lookahead.value else "end of input") + 
+            " near '#{input.substr(lookahead.from)}'"
     result
 
   # *****************************************************************************************************************
@@ -294,14 +350,21 @@ parse = (input) ->
   #             Útil para el if, while, ...
   # *****************************************************************************************************************
   condition = ->
-    left = expression()                           # Guardamos en left la expresión a la izquierda de la condición
-    type = lookahead.value                        # Se almacena en type el tipo de comparación: ==, <=, >=, ...
-    match "COMPARISON"                            # Se verifica que ahora va la comparación y seguimos al sig.
-    right = expression()                          # Se almacena la expresión a la derecha de la condición
-    result =
-      type: type
-      left: left
-      right: right
+    if lookahead and lookahead.type is "ODD"
+      match "ODD"
+      right = expression()
+      result =
+        type: "ODD"
+        value: right
+    else
+        left = expression()                       # Guardamos en left la expresión a la izquierda de la condición
+        type = lookahead.value                    # Se almacena en type el tipo de comparación: ==, <=, >=, ...
+        match "COMPARISON"                        # Se verifica que ahora va la comparación y seguimos al sig.
+        right = expression()                      # Se almacena la expresión a la derecha de la condición
+        result =
+          type: type
+          left: left
+          right: right
     result
 
   # *****************************************************************************************************************
@@ -355,21 +418,21 @@ parse = (input) ->
         value: lookahead.value
 
       match "ID"
-    else if lookahead.type is "("               # El lookahead es del tipo "(" entonces tiene que cumplir "expr )"
-      match "("                                 # Casa con ( y sigue con el sig.
-      result = expression()                     # Se idendifica la expresión y se almacena el resultado
-      match ")"                                 # Tiene que cerrar el paréntesis tras la expresión. Y seguimos con el sig.
+    else if lookahead.type is "("         # El lookahead es del tipo "(" entonces tiene que cumplir "expr )"
+      match "("                           # Casa con ( y sigue con el sig.
+      result = expression()               # Se idendifica la expresión y se almacena el resultado
+      match ")"                           # Tiene que cerrar el paréntesis tras la expresión. Y seguimos con el sig.
     else # Throw exception
       throw "Syntax Error. Expected number or identifier or '(' but found " + 
-        (if lookahead then lookahead.value else "end of input") + 
-        " near '" + input.substr(lookahead.from) + "'"
+            (if lookahead then lookahead.value else "end of input") + 
+            " near '" + input.substr(lookahead.from) + "'"
     result
 
-  tree = statements(input)
+  tree = program(input)
   if lookahead?
     throw "Syntax Error parsing statements. " + 
-      "Expected 'end of input' and found '" + 
-      input.substr(lookahead.from) + "'"  
+          "Expected 'end of input' and found '" + 
+          input.substr(lookahead.from) + "'"  
   tree
 
 window.parse = parse

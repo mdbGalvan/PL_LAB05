@@ -1,3 +1,5 @@
-a = 4*2;
-while (b + 1) <= 10 do p a;
-if (a / b - b * (b / c)) == (a * a + b) then p a
+BEGIN
+	a = 4*2;
+	WHILE (b + 1) <= 10 DO p a;
+	IF (a / b - b * (b / c)) == (a * a + b) THEN P a
+END.

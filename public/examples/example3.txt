@@ -1,3 +1,6 @@
-a = 4*2;
-b = 2*(a+1);
-p b
+CONST a=1;
+BEGIN
+	WHILE a <= 2 DO
+		a = a+1
+END.
+	
