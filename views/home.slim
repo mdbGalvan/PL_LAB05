@@ -37,7 +37,6 @@ body
           td
             input#PARSE.mylink[value="parse" type="button"]
 
-
       javascript:
           function dump_get(fileName) {
               $.get(fileName, function (data) {
@@ -72,3 +71,7 @@ body
               pre#INIPUT
             td
               pre#OUTPUT
+
+    script src="javascripts/jquery.stickytableheaders.js" 
+    javascript:
+      $("table.ini").stickyTableHeaders();

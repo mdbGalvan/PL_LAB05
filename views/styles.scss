@@ -12,6 +12,7 @@ $red: #903;
 $black: #444;
 $white: #fff;
 $blue: #002EB8;
+$brown: #E5B98A;
 $brown-medium: #7F674C;
 $brown-dark: #403326;
 $brown-light: #FFCD99;
@@ -128,7 +129,7 @@ div.unhidden {
   width: 95%;
 }
 
-table.ini {
+table {
   border-collapse: separate;
   margin: 0 auto 0 auto;
   &.ini {
@@ -209,9 +210,10 @@ table.loadfile {
   background-color: $brown-medium;
   width: $width;
   border-radius: 7px;
+  color: $brown;
   td.file {
     border-radius: 7px;
-    background-color: white;
+    background-color: $brown;
   }
 }
 
@@ -226,6 +228,9 @@ ul.file {
   width: 100px;
   background-color: $brown-dark;
   color: white;
+  padding: 3px 6px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* ESTILO DEL TEXTAREA */
@@ -254,7 +259,7 @@ ul.file {
 /* ESTILO DEL BOTÓN */
 
 .mylink {
-  width: 630px;
+  width: 100px;
   font-weight: bold;
   -moz-box-shadow: inset 0px 1px 0px 0px #a6827e;
   -webkit-box-shadow: inset 0px 1px 0px 0px #a6827e;
