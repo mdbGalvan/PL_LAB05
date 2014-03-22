@@ -12,30 +12,43 @@ body
 
 body
   header
+    img src="/images/logo.png" 
     h1 Predictive Recursive Descent Parser
+    h2 A simple example of a predictive parser
     == slim :nav
   section
-    p This website contains a simple example of a predictive parser.
     /img src="/images/st.gif" alt="Syntax Tree"
     #header.header
-      p
-        | Load example to parse:
-      div
-        textarea#original[autofocus cols="80" rows="5"]
       br
-      div
-        .loadfile
-          div
-            | Examples Files 
-          button#example1[type="button" onclick="dump_ajax('/examples/example1.txt');"]
-            | example1
-          button#example2[type="button" onclick="dump_get('/examples/example2.txt');"]
-            | example2
-          button#example3[type="button" onclick="dump_get('/examples/example3.txt');"]
-            | example3
-          button#exampleerr[type="button" onclick="dump_get('/examples/example_err.txt');"]
-            | example_err
-          input#files type="file" 
+      table.loadfile
+        tr
+          td
+            b Load example to parse:
+          td
+            b Or write your code:
+        tr
+          td.file
+            ul.file
+              li
+                button#example1.example[type="button" onclick="dump_ajax('/examples/example1.txt');"] example1
+              li
+                button#example2.example[type="button" onclick="dump_get('/examples/example2.txt');"] example2
+              li
+                button#example3.example[type="button" onclick="dump_get('/examples/example3.txt');"] example3
+              li
+                button#example3.example[type="button" onclick="dump_get('/examples/example4.txt');"] example4
+              li
+                button#example3.example[type="button" onclick="dump_get('/examples/example5.txt');"] example5
+              li
+                button#exampleerr.example[type="button" onclick="dump_get('/examples/example_err.txt');"] example_err
+          td
+            textarea#original autofocus="" rows="7" 
+        tr
+          td
+            input#files type="file" / 
+          td
+            input#PARSE.mylink[value="PARSE" type="button"]
+
 
       javascript:
           function dump_get(fileName) {
@@ -59,7 +72,6 @@ body
 
     br
 
-    input#PARSE.mylink[value="parse" type="button"]
     #out.hidden
       table.ini
         thead
