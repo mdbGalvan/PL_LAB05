@@ -1,7 +1,10 @@
 main = ()-> 
+  myCodeMirror = $(".CodeMirror")[0].CodeMirror
+  source = myCodeMirror.getValue()
+
   out.className = "unhidden"
-  $("#INIPUT").html $("#original").val()
-  source = original.value
+  $("#INIPUT").html myCodeMirror.getValue()
+
   try 
     lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="list"> <%= matches[index] %> </li> <% }); %> </ol>'
     output_template = _.template(lista)
@@ -18,18 +21,20 @@ main = ()->
 
   OUTPUT.innerHTML = result
   if window.localStorage
-    localStorage.original = original.value
+    myCodeMirror = $(".CodeMirror")[0].CodeMirror
+    localStorage.original = myCodeMirror.getValue()
     localStorage.output = result;
 
 window.main = main
 
 window.onload = ()-> 
   PARSE.onclick = main
-  if window.localStorage and localStorage.original
-    $("#original").val localStorage.original
+  if window.localStorage and localStorage.original and localStorage.output
     out.className = "unhidden"
-    $("#INIPUT").html $("#original").val()
+    myCodeMirror = $(".CodeMirror")[0].CodeMirror
+    myCodeMirror.setValue(localStorage.original)
     OUTPUT.innerHTML = localStorage.output
+    $("#INIPUT").html myCodeMirror.getValue()
   else
     $("#original").val "BEGIN\n a = a + 1\nEND."
     out.className = "unhidden"

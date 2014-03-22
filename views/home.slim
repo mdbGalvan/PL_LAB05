@@ -18,19 +18,19 @@ body
           td.file
             ul.file
               li
-                button#example1.example[type="button" onclick="dump_ajax('/examples/example1.txt');"] example1
+                button#example1.example[type="button" onclick="window.ajax('/examples/example1.txt');"] example1
               li
-                button#example2.example[type="button" onclick="dump_get('/examples/example2.txt');"] example2
+                button#example2.example[type="button" onclick="window.get('/examples/example2.txt');"] example2
               li
-                button#example3.example[type="button" onclick="dump_get('/examples/example3.txt');"] example3
+                button#example3.example[type="button" onclick="window.get('/examples/example3.txt');"] example3
               li
-                button#example3.example[type="button" onclick="dump_get('/examples/example4.txt');"] example4
+                button#example3.example[type="button" onclick="window.get('/examples/example4.txt');"] example4
               li
-                button#example3.example[type="button" onclick="dump_get('/examples/example5.txt');"] example5
+                button#example3.example[type="button" onclick="window.get('/examples/example5.txt');"] example5
               li
-                button#exampleerr.example[type="button" onclick="dump_get('/examples/example_err.txt');"] example_err
+                button#exampleerr.example[type="button" onclick="window.get('/examples/example_err.txt');"] example_err
           td
-            textarea#original autofocus="" rows="7" 
+            textarea#original[autofocus rows="7" name="Code"]
         tr
           td
             input#files type="file" / 
@@ -38,24 +38,11 @@ body
             input#PARSE.mylink[value="parse" type="button"]
 
       javascript:
-          function dump_get(fileName) {
-              $.get(fileName, function (data) {
-                $("#original").val(data);
-                if (window.localStorage) {localStorage.original = data;}
-              });
-              
-            };
-          function dump_ajax(fileName) {
-            $.ajax({
-              url : fileName,
-                    dataType: "text",
-                    success : function (data) {
-                      $("#original").val(data);
-                      // Si el navegador soporta localStore almacenamos en el localStorage los datos introducidos
-                      if (window.localStorage) {localStorage.original = data;}
-                    }
-            });
-          }
+          var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("original"), {
+            lineNumbers: true,
+            viewportMargin: Infinity,
+            mode: "javascript"
+          });
 
     br
 
