@@ -1,0 +1,15 @@
+VAR b, h, a;
+
+PROCEDURE area;
+BEGIN
+    a = b * h
+END;
+
+BEGIN
+    x = 1;
+    WHILE x <= 3 DO
+    BEGIN
+        CALL area;
+        x = x + 1
+    END
+END.

@@ -28,16 +28,23 @@ body {
   color: $white;
 }
 
-h1 {
+h1, h2 {
   color: $white;
   font: 32px/1 $h-font;
+}
+
+header h2 {
+  font-size: 18px;
+  text-align: center;
+  color: black;
+  margin-top: -30px; 
+  padding-bottom: 10px;
 }
 
 header h1 {
   font-size: 40px;
   text-align: center;
   color: black;
-  padding-bottom: 10px;
 }
 
 header img {
@@ -92,39 +99,6 @@ label {
 nav a.current {
   background: lighten($black, 50%);
 }
-
-.loadfile {
-  background-color: $black;
-  border-radius: 7px;
-  font: 18px/1 $main-font;
-  
-  //width: 75%;
-  height: 70px;
-  padding: 10px;
-
-  button {
-    border-radius: 7px;
-    color: $white;
-    font-size: 16px;
-    padding: 5px;
-    text-align: center;
-    margin: 5px 0px 15px 15px;
-    background-color: $blue;
-  }
-  input {
-    color: $white;
-    padding: 5px;
-    margin: 5px 0px 15px 15px;
-    background-color: $blue;
-    float: left;
-    list-style: none;
-    text-align: center;
-  }
-   
-  button:hover, input:hover {
-    cursor:pointer;
-  }
-}
    
 .error {
   color: $white;
@@ -150,7 +124,7 @@ div.unhidden {
   width: 95%;
 }
 
-table {
+table.ini {
   border-collapse: separate;
   margin: 0 auto 0 auto;
   &.ini {
@@ -223,12 +197,33 @@ li.list {
   }
 }
 
+/* ESTILO DE LA TABLA loadfile */
+
+table.loadfile {
+  border-collapse: separate;
+  border-spacing: 35px 15px;
+  background-color: #FAAC58;
+  width: $width;
+  border-radius: 7px;
+  td.file {
+    border-radius: 7px;
+    background-color: white;
+  }
+}
+
+/* ESTILO DE LOS FICHEROS */
+
+ul.file {
+  list-style: none;
+  padding: 5;
+}
+
 /* ESTILO DEL TEXTAREA */
 
 #original {                /* http://www.css3maker.com/index.html */
   margin-left: auto;
   margin-right: auto;
-  width: 1085px;
+  width: 600px;
   background-color: #FFFFFF;
   padding: 15px 0px 24px 21px;
   border: none;
@@ -270,6 +265,7 @@ li.list {
   font-family: arial;
   font-size: 15px;
   padding: 6px 13px;
+  width: 630px;
   text-decoration: none;
   text-shadow: 0px 1px 0px #263666;
   &:hover {

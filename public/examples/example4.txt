@@ -1,0 +1,8 @@
+CONST a=1, b=3;
+BEGIN
+	WHILE a == b DO
+	BEGIN
+		a = a + 1;
+                b = b + 2
+	END
+END.
