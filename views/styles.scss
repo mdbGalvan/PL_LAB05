@@ -133,6 +133,7 @@ table {
   border-collapse: separate;
   margin: 0 auto 0 auto;
   &.ini {
+    width: 750px;
     th {
       font-family: pakenham;
       font-size: 20px;
@@ -214,6 +215,7 @@ table.loadfile {
   td.file {
     border-radius: 7px;
     background-color: $brown;
+    width: 200px;
   }
 }
 
