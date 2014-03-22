@@ -53,23 +53,25 @@ suite('PRUEBAS PARA LA TOKENS()', function() {
 
 suite('PRUEBAS PARA DUMP_GET() Y DUMP_AJAX()', function() {
 	test('GET', function() {
-		dump_get('/examples/example1.txt');
+		window.get('/examples/example1.txt');
 		assert.isString($("#original").val());
     });	
 	test('AJAX', function() {
-		dump_ajax('/examples/example2.txt');
+		window.ajax('/examples/example2.txt');
 		assert.isString($("#original").val());
     });	
 });
 
-suite('PRUEBAS PARA MAIN()', function() {
+suite('PRUEBAS PARA MAIN() Y CODEMIRROR', function() {
 	test('If', function() {
-		original.value = "begin\n if a == 1 then call b\n end.";
+		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
+   	 	myCodeMirror.setValue("begin\n if a == 1 then call b\n end.");
         window.main();
 		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "IF",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 1\n      }\n    },\n    "right": {\n      "type": "CALL",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');
     });	
 	test('Call', function() {
-		original.value = "begin\n call b\n end.";
+		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
+   	 	myCodeMirror.setValue("begin\n call b\n end.");
         window.main();
 		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
     });	
@@ -143,13 +145,15 @@ suite('PRUEBAS PARA PARSE()', function() {
 
 suite('PRUEBAS PARA COMPROBAR ERRORES', function() {	
 	test('Operador - main()', function() {
-		original.value = 'a = 2 + (3';
+		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
+   	 	myCodeMirror.setValue("a = 2 + (3");
         main();
 		assert.match(OUTPUT.innerHTML, /error/);
 	});
 
 	test('Id - main()', function() {
-		original.value = '1$%&· = 5 + 3;';
+		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
+   	 	myCodeMirror.setValue('1$%&· = 5 + 3;');
         main();
 		assert.match(OUTPUT.innerHTML, /error/);
 	});

@@ -36,7 +36,7 @@ window.onload = ()->
     OUTPUT.innerHTML = localStorage.output
     $("#INIPUT").html myCodeMirror.getValue()
   else
-    $("#original").val "BEGIN\n a = a + 1\nEND."
+    $("#original").val "VAR a, b;\n BEGIN \n CALL b;\n a = b END."
     out.className = "unhidden"
     $("#INIPUT").html $("#original").val()
     
