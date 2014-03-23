@@ -16,7 +16,7 @@ La aplicación fue propuesta para ser desarrolla en la asignatura **Procesadores
 
 Puede probar en [Heroku](http://pl-lab05.herokuapp.com/), el funcionamiento del *Analizador Descendente Predictivo Recursivo*.
 
-...
+Pueden cargarse ejemplos previos de código de la gramática PL/0 cliqueando sobre ellos, también es posible subir un fichero propio o incluso introducir el código en el textarea. Una vez, cargada puedes pulsar el botón de parse para analizar el código. Luego, se muestra el resultado en una tabla de dos columnas. Donde la primera columna muestra el código original y la segunda muestra el resultado de lo analizado (con ayuda del underscore) dividido por conjunto de código.
 
 # Desarrollo
 
@@ -30,6 +30,7 @@ Los lenguajes y herramientas (frameworks, librerías, etc.) utilizados para el d
 * [CoffeeScript](http://coffeescript.org/) 
 * [Slim](http://slim-lang.com/)
 * [Sass](http://sass-lang.com/) 
+* [MathJax](http://docs.mathjax.org/en/latest/start.html)
 
 # Tests
 

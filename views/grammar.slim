@@ -3,57 +3,88 @@ script[type="text/x-mathjax-config"]
   |  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}}); 
 script[type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"]
 
-br
-|  Recuerde que una gramática $G$ es una cuaterna $G =(\Sigma,V,P,S)$. 
-ol
-  li
-    | $\Sigma$ es el conjunto de terminales. 
-  li
-    | $V$ es un conjunto (disjunto de $\Sigma$) que se denomina conjunto de 
-    i
-      | variables sintácticas
-    |  o 
-    i
-      | categorías gramáticales
-    | , 
-  li
-    | $P$ es un conjunto de pares de $V \times (V \cup \Sigma )^*$. En vez de escribir un par usando la notación $(A, \alpha) \in P$ se escribe $A \rightarrow \alpha$. Un elemento de $P$ se denomina producción. 
-  li
-    | Por último, $S$ es un símbolo del conjunto $V$ que se denomina símbolo de arranque. 
-  br
-  | Dada una gramática $G=(\Sigma,V,P,S)$ se denota por $L(G)$ o lenguaje
-    generado por $G$ al lenguaje:
-  br
-    .centered
-      | $L(G) = \{ x \in \Sigma^* : S \stackrel{*}{\Longrightarrow} x \}$
-  br
-    | Esto es, el lenguaje generado por la gramática $G$ esta
-      formado por las cadenas de terminales que pueden ser 
-    i derivados 
-    | desde el símbolo de arranque.
+body
+  header
+    img src="/images/logo.png" 
+    h1 Predictive Recursive Descent Parser
+    h2 A simple example of a predictive parser
+    == slim :nav
+  section 
+    br 
+    br
+    .grammar
+      |  Recuerde que una gramática $G$ es una cuaterna $G =(\Sigma,V,P,S)$. 
+      ol
+        li
+          | $\Sigma$ es el conjunto de terminales. 
+        li
+          | $V$ es un conjunto (disjunto de $\Sigma$) que se denomina conjunto de 
+          i
+            | variables sintácticas
+          |  o 
+          i
+            | categorías gramáticales
+          | , 
+        li
+          | $P$ es un conjunto de pares de $V \times (V \cup \Sigma )^*$. En vez de escribir un par usando la notación $(A, \alpha) \in P$ se escribe $A \rightarrow \alpha$. Un elemento de $P$ se denomina producción. 
+        li
+          | Por último, $S$ es un símbolo del conjunto $V$ que se denomina símbolo de arranque. 
+        br
+        | Dada una gramática $G=(\Sigma,V,P,S)$ se denota por $L(G)$ o lenguaje
+          generado por $G$ al lenguaje:
+        br
+          .centered
+            | $L(G) = \{ x \in \Sigma^* : S \stackrel{*}{\Longrightarrow} x \}$
+        br
+          | Esto es, el lenguaje generado por la gramática $G$ está
+            formado por las cadenas de terminales que pueden ser 
+          i derivados 
+          | desde el símbolo de arranque.
 
-| Esta es la gramática para nuestra práctica:
+      | Esta es la gramática para nuestra práctica:
 
-ol
-  li
-    |  $\Sigma = \{ ; =, ID, P, +, *, (, ), NUM \}$, 
-  li
-    |  $V = \{ statements, statement, expression, term, factor \}$ 
-  li
-    |  Productions: 
-    ol
-      li
-        |  statements $ \rightarrow$ statement ';' statements $\vert$ statement 
-      li
-        |  statement $ \rightarrow$ ID '=' expression $\vert$ P expression 
-      li
-        |  expression $ \rightarrow$ term '+' expression $\vert$ term 
-      li
-        |  term $ \rightarrow$ factor '*' term $\vert$ factor 
-      li
-        |  factor $ \rightarrow$ '(' expression ')' $\vert$ ID $ \vert$ NUM 
-  li
-    |  Start symbol: $statements$ 
-br
-br
-br
+      ol
+        li
+          |  $\Sigma = \{ ;, =, ID, P, +, -, *, /, (,), ., <=, >=, ==, !=, <>, <, >, NUM, IF, THEN, WHILE, DO, BEGIN, END, CALL, CONST, VAR, PROCEDURE, ODD \}$, 
+        li
+          |  $V = \{ program, block, statements, statement, condition, expression, term, factor \}$ 
+        li
+          |  Productions: 
+          ol
+            li
+              |  program $ \rightarrow$ block "."
+            li
+              |  block $ \rightarrow$
+              |         ["CONST" ID "=" NUM {"," ID "=" NUM} ";"] ?
+              |         ["VAR" ID {"," ID} ";"] ?
+              |         {"PROCEDURE" ID ";" block ";"} * statement .
+            li
+              |  statements $ \rightarrow$ 
+              |         statement ';' statements $\vert$ statement 
+            li
+              |  statement $ \rightarrow$ 
+              |         ID "=" expression
+              |         $\vert$ "CALL" ID
+              |         $\vert$ "BEGIN" statement ";" {statement ";"} "END"
+              |         $\vert$ "IF" condition "THEN" statement
+              |         $\vert$ "WHILE" condition "DO" statement .
+            li
+              |  condition $ \rightarrow$
+              |         "ODD" expression
+              |         $\vert$ expression ("="$\vert$"#"$\vert$"<"$\vert$"<="$\vert$">"$\vert$">=") expression .
+            li
+              |  expression $ \rightarrow$ 
+              |         ["+"$\vert$"-"] term {("+"$\vert$"-") term} .
+            li
+              |  term $ \rightarrow$ 
+              |         factor {("*"$\vert$"/") factor} . 
+            li
+              |  factor $ \rightarrow$ 
+              |         ID
+              |         $\vert$ NUM
+              |         $\vert$ "(" expression ")" .
+        li
+          |  Start symbol: $program$ 
+    br
+    br
+    br

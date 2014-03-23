@@ -6,7 +6,7 @@ main = ()->
   $("#INIPUT").html myCodeMirror.getValue()
 
   try 
-    lista = '<<ol> <% _.each(tokens, function(token, index){ %> <li class="list"> <%= matches[index] %> </li> <% }); %> </ol>'
+    lista = '<<ol class="list"> <% _.each(tokens, function(token, index){ %> <li class="list"> <%= matches[index] %> </li> <% }); %> </ol>'
     output_template = _.template(lista)
     matches = []
     tokens = parse(source)
@@ -65,7 +65,7 @@ String::tokens = ->
     STRING: /('(\\.|[^'])*'|"(\\.|[^"])*")/g      # Casa con palabras entre "" ó '', y escapa \", \'
     ONELINECOMMENT: /\/\/.*/g                     # Casa con // comentario
     MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g    # /* comentario con multilínea */
-    COMPARISONOPERATOR: /[<>=!]=|[<>]/g           # Casa con <=, >=, ==, !=, <>
+    COMPARISONOPERATOR: /[<>=!]=|[<>]/g           # Casa con <=, >=, ==, !=, <>, <, >
     ONECHAROPERATORS: /([=()&|;:,\.<>{}[\]])/g
     ADDOP: /[+-]/g                                # Casa con + o -, útil para expression()
     MULTOP: /[*\/]/g                              # Casa con * o /, útil para term()

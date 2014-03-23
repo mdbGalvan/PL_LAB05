@@ -165,13 +165,23 @@ table {
   }
 }
 
+/* ESTILO PARA LA PRESENTACIÓN DE LA GRAMÁTICA */
+
+.grammar {
+  background-color: $brown-medium;
+  width: 1070;
+  border-radius: 7px;
+  color: $brown;
+  padding: 20px;
+}
+
 /* ESTILO DE LAS LISTAS QUE CONTIENE EL ÁRBOL SINTÁCTICO */
 
-ol {
+ol.list {
   margin-top: -35px;
-  color: $black;
+  color: #444444;
   li {
-    font-family: $txtarea-font;
+    font-family: Arial;
     vertical-align: middle;
     text-align: left;
     font-family: arial;
@@ -191,15 +201,14 @@ ol {
       -moz-transition: ease-in all 300ms;
       -webkit-transition: ease-in all 300ms;
     }
-  }
-}
-
-li.list {
-  &:nth-child(odd) {
-    background-color: #E7FC92;
-  }
-  &:nth-child(even) {
-    background-color: #92F2FC;
+    &.list {
+      &:nth-child(odd) {
+        background-color: #E7FC92;
+      }
+      &:nth-child(even) {
+        background-color: #92F2FC;
+      }
+    }
   }
 }
 
