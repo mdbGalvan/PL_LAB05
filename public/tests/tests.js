@@ -67,13 +67,13 @@ suite('PRUEBAS PARA MAIN() Y CODEMIRROR', function() {
 		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
    	 	myCodeMirror.setValue("begin\n if a == 1 then call b\n end.");
         window.main();
-		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "IF",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 1\n      }\n    },\n    "right": {\n      "type": "CALL",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');
+		assert.equal(OUTPUT.innerHTML,'<ol class="list">  <li class="list"> [\n  {\n    "type": "IF",\n    "left": {\n      "type": "==",\n      "left": {\n        "type": "ID",\n        "value": "a"\n      },\n      "right": {\n        "type": "NUM",\n        "value": 1\n      }\n    },\n    "right": {\n      "type": "CALL",\n      "value": "b"\n    }\n  }\n] </li>  </ol>');
     });	
 	test('Call', function() {
 		var myCodeMirror = $('.CodeMirror')[0].CodeMirror;
    	 	myCodeMirror.setValue("begin\n call b\n end.");
         window.main();
-		assert.equal(OUTPUT.innerHTML,'<ol>  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
+		assert.equal(OUTPUT.innerHTML,'<ol class="list">  <li class="list"> [\n  {\n    "type": "CALL",\n    "value": "b"\n  }\n] </li>  </ol>');
     });	
 });
 
